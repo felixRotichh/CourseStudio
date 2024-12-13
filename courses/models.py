@@ -19,15 +19,21 @@ class AccessRequirement(models.TextChoices):
 def handle_upload(instance, filename):
     return f"{filename}"
 
-def get_public_id_prefix(instance,*args, **kwargs):
+def generate_public_id(instance,*args, **kwargs):
     title = instance.title
-    if title:
-        slug = slugify(title)
-        unique_id = slugify(uuid.uuid4()).replace("-", "")[:5]
-        return f"courses/{slug}-{unique_id}"
-    if instance.id:
-        return f"courses/{instance.id}"
-    return "courses"
+    unique_id = slugify(uuid.uuid4()).replace("-", "")
+    if not title:
+        return unique_id
+    
+    slug = slugify(title)
+    unique_id_short = unique_id[:5] 
+    return f"courses/{slug}-{unique_id}"
+
+def get_public_id_prefix(instance,*args, **kwargs):
+    public_id = instance.public_id
+    if not public_id:
+        return "courses"
+    return f"courses{public_id}"
 
 def get_display_name(instance,*args, **kwargs):
     title = instance.title
@@ -38,6 +44,7 @@ def get_display_name(instance,*args, **kwargs):
 class Course(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
+    public_id = models.CharField(max_length=130, blank=True, null=True)
     #image = models.ImageField(upload_to=handle_upload, blank=True, null=True)
     image = CloudinaryField("image", null=True, 
                             public_id_prefix=get_public_id_prefix, 
@@ -56,6 +63,14 @@ class Course(models.Model):
     )
     timestamp = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        #before save
+        if self.public_id == "" or self.public_id is None:
+            self.public_id = generate_public_id(self)
+        super().save(*args, **kwargs)
+
+        #after save
 
     @property
     def is_published(self):
@@ -94,6 +109,7 @@ class Lesson(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     title = models.CharField(max_length=150)
     description = models.TextField(blank=True, null=True)
+    public_id = models.CharField(max_length=130, blank=True, null=True)
     thumbnail = CloudinaryField("image", blank=True, null=True)
     video = CloudinaryField("video", blank=True, null=True, resource_type="video")
     order = models.IntegerField(default=0)
@@ -108,3 +124,10 @@ class Lesson(models.Model):
 
     class Meta:
         ordering = ['order', '-updated']
+
+
+    def save(self, *args, **kwargs):
+        #before save
+        if self.public_id == "" or self.public_id is None:
+            self.public_id = generate_public_id(self)
+        super().save(*args, **kwargs)
