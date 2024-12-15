@@ -88,6 +88,7 @@ class Course(models.Model):
 
     def get_absolute_url(self):
         return self.path
+    
     @property
     def path(self):
         return f"/courses/{self.public_id}"
@@ -99,29 +100,7 @@ class Course(models.Model):
     def is_published(self):
         return self.status == PublishStatus.PUBLISHED
     
-    @property 
-    def image_admin(self):
-        return helpers.get_cloudinary_image_object(self,
-                                            field_name="image",
-                                            as_html=False,
-                                            width=200
-                                            )
-    
-    def get_image_thumbnail(self, as_html=False, width=500):
-        return helpers.get_cloudinary_image_object(self,
-                                            field_name="image",
-                                            as_html=as_html,
-                                            width=width
-                                            )
-    
 
-    def get_image_detail(self, as_html=False, width=750):
-        return helpers.get_cloudinary_image_object(self,
-                                            field_name="image",
-                                            as_html=as_html,
-                                            width=width
-                                            )
-    
 #Lesson.objects.alll() #lesson queryset -> all rows
 #lesson.objects.first()
 #course_obj = Course.objects.first()
@@ -142,8 +121,10 @@ class Lesson(models.Model):
     video = CloudinaryField("video", 
                             public_id_prefix=get_public_id_prefix, 
                             display_name=get_display_name,
+                            type = 'private',
                             tags = ['video', 'lesson'],
-                            blank=True, null=True, resource_type="video")
+                            blank=True, null=True, 
+                            resource_type="video")
     order = models.IntegerField(default=0)
     can_preview = models.BooleanField(default=False, help_text="If user does not have access course, can they see this?" )
     status = models.CharField(
