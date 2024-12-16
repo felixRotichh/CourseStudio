@@ -28,13 +28,14 @@ class LessonInline(admin.StackedInline):
     display_image.short_description = "Current image"
 
     def display_video(self, obj, *args,**kwargs):
-        url = helpers.get_cloudinary_video_object(
+        video_embed_html = helpers.get_cloudinary_video_object(
             obj, 
             field_name='video', 
+            as_html= True,
             width=550)
         
-        if url:
-            return format_html(f"{url}")
+        if video_embed_html:
+            return video_embed_html
         return "No video available"
     
     display_video.short_description = "Current video"
