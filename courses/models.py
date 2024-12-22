@@ -58,7 +58,7 @@ def get_display_name(instance,*args, **kwargs):
 class Course(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    public_id = models.CharField(max_length=130, blank=True, null=True)
+    public_id = models.CharField(max_length=130, blank=True, null=True, db_index=True)
     #image = models.ImageField(upload_to=handle_upload, blank=True, null=True)
     image = CloudinaryField("image", null=True, 
                             public_id_prefix=get_public_id_prefix, 
@@ -112,7 +112,7 @@ class Lesson(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     title = models.CharField(max_length=150)
     description = models.TextField(blank=True, null=True)
-    public_id = models.CharField(max_length=130, blank=True, null=True)
+    public_id = models.CharField(max_length=130, blank=True, null=True, db_index=True)
     thumbnail = CloudinaryField("image", 
                                 public_id_prefix=get_public_id_prefix, 
                                 display_name=get_display_name,

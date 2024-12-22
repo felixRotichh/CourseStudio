@@ -5,7 +5,7 @@ from . import services
 def course_list_view(request):
     queryset = services.get_publish_courses()
     print(queryset)
-    return JsonResponse({"data": [x.id for x in queryset]})
+    #return JsonResponse({"data": [x.path for x in queryset]})
     return render(request, "courses/list.html", {})
 
 def course_detail_view(request, course_id=None, *args, **kwargs):
@@ -14,7 +14,7 @@ def course_detail_view(request, course_id=None, *args, **kwargs):
         raise Http404
     lessons_queryset = course_obj.lesson_set.all()
     return JsonResponse({"data": course_obj.id, 'lesson_ids':
-                         [x.id for x in lessons_queryset] })
+                         [x.path for x in lessons_queryset] })
     return render(request, "courses/detail.html", {})
 
 
