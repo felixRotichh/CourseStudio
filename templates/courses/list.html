@@ -1,8 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
 
 
-<ul>
-    <li>Item 1</li>
-    <li>Item 2</li>
-    <li>Item 3</li>
-    <li>Item 4</li>
+
+<ul class="list-disc">
+    {% for obj in object_list %}
+    <li><a class="text-blue-500 hover:text-blue-800
+      hover:underline" href="{{ obj.get_absolute_url }}">{{ obj.title }}</a></li>
+    {% endfor %}
 </ul>
+
+{% endblock content %}
